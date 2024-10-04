@@ -22,10 +22,6 @@ A command-line interface tool for performing various file operations across diff
 git clone https://github.com/geo-afk/custom-shell.git
 <<<<<<< updates
 cd custom-shell
-=======
-cd file-operations-cli
-pip install pydantic: 2.9.2
->>>>>>> main
 ```
 
 ## Usage
