@@ -1,3 +1,4 @@
+# C-Shell CLI Tool
 
 
 A command-line interface tool for performing various file operations across different operating systems (Windows, Linux, and macOS).
@@ -19,7 +20,12 @@ A command-line interface tool for performing various file operations across diff
 ##### 2. Clone this repository:
 ```bash
 git clone https://github.com/geo-afk/custom-shell.git
-
+<<<<<<< updates
+cd custom-shell
+=======
+cd file-operations-cli
+pip install pydantic: 2.9.2
+>>>>>>> main
 ```
 
 ## Usage
@@ -59,6 +65,8 @@ Enter new filename: newtest.txt
 - `input_parser.py` - Parses and validates user input
 - `help_parser.py` - Manages the help system
 - `.\static\constant_types.py` - Defines constants, enums, and type definitions
+- `.\static\exceptions` - Definition of custom exceptions 
+- `.\static\help.json` - Stores the help details for command `General` `Specific`
 
 
 ## Technical Details
@@ -84,8 +92,8 @@ Enter new filename: newtest.txt
    - User-friendly error messages
 
 ##### 4. **Help System**
-
-   - Context-sensitive help for each command
+   - General for all commands 
+   - Specific help for a certain command ex:` help <create> `
 
 ## Error Handling
 
@@ -97,6 +105,10 @@ The tool uses custom exceptions:
 ## Extending the Tool
 
 To add new file operations:
+##### 1. Add the operation to `FileOperation` enum in `constant_types.py` file
+##### 2. Add corresponding commands for each platform in `FILE_OPERATIONS`
+##### 3. Update the help system in the JSON file
+##### 4. Implement any necessary validation in `InputParser`
 
 
 ## Limitations
@@ -105,4 +117,6 @@ To add new file operations:
 - Supports only .txt, .pdf, and .docx file extensions
 - Basic command piping functionality
 
+## License
 
+[Licence](LICENSE)
