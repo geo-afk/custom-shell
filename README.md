@@ -20,7 +20,6 @@ A command-line interface tool for performing various file operations across diff
 ##### 2. Clone this repository:
 ```bash
 git clone https://github.com/geo-afk/custom-shell.git
-<<<<<<< updates
 cd custom-shell
 ```
 
