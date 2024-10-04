@@ -113,9 +113,7 @@ class InputParser:
         if len(self.parsed_inputs) == 1:
             return True
 
-        if len(self.parsed_inputs) == 2 and self.parsed_inputs[1] in FileOperation:
-            return True
-        return False
+        return len(self.parsed_inputs) == 2 and self.parsed_inputs[1] in FileOperation
 
     def valid_piped_operations(self, piped_operations: list[str]) -> bool:
         """
