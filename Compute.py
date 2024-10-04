@@ -1,4 +1,19 @@
-from typing import List, Tuple, Optional
+"""
+    This module is used to translate the commands of the user
+    into command line argument and executing them depending on the user
+    operating system.
+    the program works by figuring out if the requested operations
+    is a piped command or non-piped command
+    and executing them accordingly,
+    the program also check if operation requested is 'delete or rename'
+    operation, if:
+    delete then it checks if the file exists first before deleting any file,
+    rename: it also checks if the file already exists before doing rename operation
+
+"""
+
+
+from typing import List, Optional
 import subprocess
 import os
 from static.constant_types import (
@@ -16,52 +31,33 @@ class ComputeOperations:
         self.command_args = command_args
         self.platform = operating_system
 
-    def execute_piped_command(
-        self, first_command: List[str], second_command: List[str]
-    ) -> None:
-        with subprocess.Popen(first_command, stdout=subprocess.PIPE) as first_process:
-            with subprocess.Popen(
-                second_command, stdin=first_process.stdout, stdout=subprocess.PIPE
-            ) as piped_process:
-                if first_process.stdout:
-                    first_process.stdout.close()
-                output, _ = piped_process.communicate()
-                print(output.decode("utf-8"))
 
-    def split_piped_commands(self) -> Tuple[List[str], List[str]]:
+    def split_piped_commands(self) -> tuple[None | List[str], None | List[str]]:
         for i, arg in enumerate(self.command_args):
             if arg in PIPES:
                 return self.command_args[:i], self.command_args[i + 1 :]
-        return [], []  # Return empty lists if no pipe is found
+        return None, None
 
-    def execute_command(
-        self, command: List[str]
-    ) -> Optional[subprocess.CompletedProcess]:
-        try:
-            return subprocess.run(
-                args=command, check=True, stdout=subprocess.PIPE, text=True
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing command: {e}")
-            print(f"Command output: {e.stdout}")
-        return None
 
     def prepare_rename_command(self, old_filename: str) -> List[str]:
-        new_filename = input("Enter new filename: ")
+        if not self.file_exists(old_filename):
+            raise FileOperationError(f"Invalid rename operation: '{old_filename}' does not exist")
+        else:
+            new_filename = input("Enter new filename: ")
 
-        if not self.is_valid_file_extension(new_filename):
-            raise InvalidCommand(
-                f"Invalid file extension. Supported extensions are: {', '.join(VALID_EXTENSIONS)}"
-            )
-        if self.file_exists(new_filename):
-            raise FileOperationError(f"File {new_filename} already exists")
+            if not self.is_valid_file_extension(new_filename):
+                raise InvalidCommand(
+                    f"Invalid.. Supported extensions are: {', '.join(VALID_EXTENSIONS)}"
+                )
+            if self.file_exists(new_filename):
+                raise FileOperationError(f"File '{new_filename}' already exists")
 
-        operation = FileOperation("rename")
+            operation = FileOperation("rename")
         return FILE_OPERATIONS[operation][self.platform] + [old_filename, new_filename]
 
     def validate_delete_operation(self, filename: str) -> None:
         if not self.file_exists(filename):
-            raise FileOperationError("Invalid operation: file does not exist")
+            raise FileOperationError(f"Invalid delete operation: '{filename}' does not exist")
 
     def is_command_piped(self) -> bool:
         return any(pipe in self.command_args for pipe in PIPES)
@@ -98,6 +94,29 @@ class ComputeOperations:
         )
 
         self.execute_piped_command(first_cmd, second_cmd)
+
+    @staticmethod
+    def execute_piped_command(first_command: List[str], second_command: List[str]) -> None:
+        with subprocess.Popen(first_command, stdout=subprocess.PIPE) as first_process:
+            with subprocess.Popen(
+                    second_command, stdin=first_process.stdout, stdout=subprocess.PIPE
+            ) as piped_process:
+                if first_process.stdout:
+                    first_process.stdout.close()
+                output, _ = piped_process.communicate()
+                print(output.decode("utf-8"))
+
+    @staticmethod
+    def execute_command(command: List[str]) -> Optional[subprocess.CompletedProcess]:
+        try:
+            return subprocess.run(
+                args=command, check=True, stdout=subprocess.PIPE, text=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command: {e}")
+            print(f"Command output: {e.stdout}")
+        return None
+
 
     @staticmethod
     def file_exists(filename: str) -> bool:

@@ -1,4 +1,4 @@
-# File Operations CLI Tool
+
 
 A command-line interface tool for performing various file operations across different operating systems (Windows, Linux, and macOS).
 
@@ -19,8 +19,7 @@ A command-line interface tool for performing various file operations across diff
 ##### 2. Clone this repository:
 ```bash
 git clone https://github.com/geo-afk/custom-shell.git
-cd file-operations-cli
-pip install pydantic: 2.9.2
+
 ```
 
 ## Usage
@@ -60,15 +59,14 @@ Enter new filename: newtest.txt
 - `input_parser.py` - Parses and validates user input
 - `help_parser.py` - Manages the help system
 - `.\static\constant_types.py` - Defines constants, enums, and type definitions
-- `\static\exceptions` - Defination of custom exceptions 
-- `static\help.json` - Strores the help details for command `General` `Specific`
+
 
 ## Technical Details
 
 ### Dependencies
 
 - Python 3.x
-- Pydantic (for data validation)
+
 
 ### Key Components
 
@@ -86,7 +84,7 @@ Enter new filename: newtest.txt
    - User-friendly error messages
 
 ##### 4. **Help System**
-   - JSON-based help content
+
    - Context-sensitive help for each command
 
 ## Error Handling
@@ -99,10 +97,7 @@ The tool uses custom exceptions:
 ## Extending the Tool
 
 To add new file operations:
-##### 1. Add the operation to `FileOperation` enum in `constant_types.py`
-##### 2. Add corresponding commands for each platform in `FILE_OPERATIONS`
-##### 3. Update the help system in the JSON file
-##### 4. Implement any necessary validation in `InputParserAndValidator`
+
 
 ## Limitations
 
@@ -110,11 +105,4 @@ To add new file operations:
 - Supports only .txt, .pdf, and .docx file extensions
 - Basic command piping functionality
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-[Licence](LICENSE)
 
