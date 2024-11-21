@@ -86,8 +86,10 @@ class RedirectValidator(Validator):
             raise InvalidCommand("Invalid redirect from file command, file does not exist.")
         try:
             return self.validate_file_extention(index)
-        except (ValueError, IndexError):
-            raise InvalidCommand("Input redirection symbol ('<') is missing a valid file.")
+        except (ValueError, IndexError) as e:
+            raise InvalidCommand(
+                "Input redirection symbol ('<') is missing a valid file."
+            ) from e
 
 
     def validate_file_extention(self, index):
