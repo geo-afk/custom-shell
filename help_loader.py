@@ -1,4 +1,4 @@
-from dataclasses import  dataclass
+from dataclasses import dataclass, field
 from typing import Dict
 import json
 
@@ -13,6 +13,8 @@ class General:
     create: str
     delete: str
     rename: str
+    modify: str
+    list:str
 
     def help_command(self, command: str) -> str:
         """
@@ -39,11 +41,13 @@ class Info:
     create: str
     delete: str
     rename: str
+    modify: str
+    list: str
 
 
 
     def __str__(self) -> str:
-        return "\n ".join([self.create, self.delete, self.rename])
+        return "\n ".join([self.create, self.delete, self.rename, self.modify, self.list])
 
 
 
@@ -87,20 +91,21 @@ class LoadHelp:
         unless and error occurs then the raises a 'ValueError' in which is graciously
         caught then a formatted output is printed to the console in #FF0000|RED.
     """
-    def __init__(self) -> None:
+    def __init__(self,  filepath: str = "./static/help.json") -> None:
+        self._filepath = filepath
         self._help_data: Help | None = None
 
-    @staticmethod
-    def load_help_data() -> Dict:
-        with open("./static/help.json", "r") as f:
+
+    def load_help_data(self) -> Dict:
+        with open(self._filepath, "r") as f:
             return json.load(f)
 
     def get_help(self) -> Help | None:
-        if self._help_data is None:
-            data = self.load_help_data()
+        if not self._help_data:
             try:
+                data = self.load_help_data()
                 self._help_data = Help(**data)
             except ValueError as e:
-                print(f"\033[91m{e}\033[0m")
+                print(f"\033[91mError loading help data: {e}\033[0m")
                 return None
         return self._help_data

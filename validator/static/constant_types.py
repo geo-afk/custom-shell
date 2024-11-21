@@ -4,12 +4,21 @@ from typing import Dict, List
 
 class FileOperation(StrEnum):
     """
-        A string enum class used to store all th operations/ commands available to
-        use in file operations
-        """
+        A string enum class used to store all the operations/ commands available to
+        use in file operations.
+    """
     CREATE = "create"
     DELETE = "delete"
     RENAME = "rename"
+
+
+class FilePermission(StrEnum):
+    """
+        A string enum class used to store the permission commands and a list command to
+        view files in directory.
+    """
+    MODIFY = "modify"
+    LIST = "list"
 
 
 class Platform(StrEnum):
@@ -43,6 +52,49 @@ FILE_OPERATIONS: Dict[FileOperation, Dict[Platform, List[str]]] = {
         Platform.LINUX: ["mv"],  # Command for renaming a file on Linux
         Platform.MAC: ["mv"],  # Command for renaming a file on macOS
     },
+}
+
+# File Permissions for windows :
+# example: icacls "C:\path\to\file.txt" /grant username:(R,W)
+# F: Full control
+# M: Modify
+# RX: Read & execute
+# R: Read-only
+# W: Write-only
+# Options using:
+# /grant: Grants permissions to a user.
+# /deny: Denies permissions for a user.
+# /remove: Removes all permissions for a user.
+# username:(R,W)
+
+
+
+# File Permission for linux:
+# example: chmod u=rwx,o=r <filename>
+# r: Read (4)
+# w: Write (2)
+# x: Execute (1)
+# Owner
+# Group
+# Others
+
+# if not sure who are the users on a system can use [command to check users]
+
+# mac uses the same commands as linus
+
+FILE_PERMISSIONS: Dict[FilePermission, Dict[Platform, List[str]]] ={
+
+    FilePermission.MODIFY: {
+        Platform.WINDOWS: ["cmd", "/c","icacls", "path", "options", "username_permission"],
+        Platform.MAC: ["chmod", "permission", "resource"],
+        Platform.LINUX: ["chmod", "permission", "resource"]
+
+    },
+    FilePermission.LIST:{
+        Platform.WINDOWS: ["cmd", "/c", "dir"],
+        Platform.MAC: ["ls", "-l",],
+        Platform.LINUX: ["ls", "-l",],
+    }
 }
 
 
