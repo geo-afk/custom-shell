@@ -63,7 +63,5 @@ class PipedCommandValidator(Validator):
 
 
         required_command = PipedCommandValidator.VALID_PIPED_COMMANDS.get(self.command[0])
-        if not required_command or required_command != piped_operations[0]:
-            return False
-        return True
+        return bool(required_command and required_command == piped_operations[0])
 
