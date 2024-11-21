@@ -102,10 +102,7 @@ class FileAccessValidator(Validator):
             return False
 
         # Check that all characters are valid permissions ('r', 'w', 'x') and no 'f' is present
-        if not all(p in FileAccessValidator.VALID_PERMISSIONS for p in permission):
-            return False
-
-        return True
+        return all((p in FileAccessValidator.VALID_PERMISSIONS for p in permission))
 
     def find_invalid_permission(self):
         permission = self.access[3:]
