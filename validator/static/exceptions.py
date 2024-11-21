@@ -1,30 +1,47 @@
 """
-    This module defines custom exceptions for
-    command validation, file operations, and common use cases.
-    thrown when a user input a command that is not supported by
-    the program.
+This module defines custom exceptions for command validation,
+file operations, and common error scenarios. These exceptions
+provide clear feedback for invalid commands or operations.
 """
-class InvalidCommand(SyntaxError):
+
+class CustomBaseException(Exception):
+    """
+    Base class for all custom exceptions in this module.
+    """
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
+class InvalidCommand(CustomBaseException):
     """
     Exception raised when an invalid command is encountered.
     """
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
+    pass
 
 
-class FileOperationError(IOError):
+class FileOperationError(CustomBaseException):
     """
-        Custom Exception that is raised for
-        an invalid file operation.
+    Exception raised for an invalid file operation.
     """
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
+    pass
 
 
-class CommonException(Exception):
+class FileAccessError(CustomBaseException):
     """
-        A general-purpose custom
-        exception for common error scenarios.
+    Exception raised for an invalid file/folder access operation.
     """
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
+    pass
+
+
+class DirectoryManagementError(CustomBaseException):
+    """
+    Exception raised for an invalid directory management command.
+    """
+    pass
+
+
+class RedirectionError(CustomBaseException):
+    """
+    Exception raised for an invalid directory management command.
+    """
+    pass

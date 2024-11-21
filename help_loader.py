@@ -15,6 +15,10 @@ class General:
     rename: str
     modify: str
     list:str
+    change: str
+    make: str
+    remove: str
+    pwd: str
 
     def help_command(self, command: str) -> str:
         """
@@ -30,26 +34,33 @@ class General:
 
 @dataclass
 class Info:
-
     """
-        This class is used to store the information for all the supported commands.
-        This class is used to print all the available command details
-        and give a small overview of all the commands,
-        the dunder '__str__' method is used for printing details of all the
-        supported commands.
+    A data class to store and display details about supported commands.
+
+    Attributes:
+        Each attribute corresponds to a supported command and contains a brief
+        description or usage information about that command.
+
+    Methods:
+        __str__():
+            Returns a formatted string listing all supported commands and their details.
     """
     create: str
     delete: str
     rename: str
     modify: str
     list: str
-
-
+    change: str
+    make: str
+    remove: str
+    pwd: str
 
     def __str__(self) -> str:
-        return "\n ".join([self.create, self.delete, self.rename, self.modify, self.list])
-
-
+        """
+        Returns:
+            str: A formatted string displaying all command details.
+        """
+        return "\n".join(f"{key}: {value}" for key, value in vars(self).items())
 
 
 
@@ -91,7 +102,7 @@ class LoadHelp:
         unless and error occurs then the raises a 'ValueError' in which is graciously
         caught then a formatted output is printed to the console in #FF0000|RED.
     """
-    def __init__(self,  filepath: str = "./static/help.json") -> None:
+    def __init__(self,  filepath: str = "./help.json") -> None:
         self._filepath = filepath
         self._help_data: Help | None = None
 
@@ -101,11 +112,20 @@ class LoadHelp:
             return json.load(f)
 
     def get_help(self) -> Help | None:
+        help_data = {}
         if not self._help_data:
             try:
                 data = self.load_help_data()
-                self._help_data = Help(**data)
+                help_data = Help(**data)
             except ValueError as e:
                 print(f"\033[91mError loading help data: {e}\033[0m")
                 return None
-        return self._help_data
+        return help_data
+
+
+    def get_help_info(self, command = None):
+        help_data = self.get_help()
+        if command:
+            return help_data.general.help_command(command)
+        return help_data.info
+

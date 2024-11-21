@@ -21,6 +21,17 @@ class FilePermission(StrEnum):
     LIST = "list"
 
 
+class DirectoryOperation(StrEnum):
+    """
+    A string enum class used to store all the operations/commands available for
+    directory-related operations.
+    """
+    MAKE = "make"
+    REMOVE = "remove"
+    CHANGE = "change"
+    CURRENT = "pwd"
+
+
 class Platform(StrEnum):
     """
         A string enum class that stores the various platforms/ Operating Systems
@@ -54,6 +65,7 @@ FILE_OPERATIONS: Dict[FileOperation, Dict[Platform, List[str]]] = {
     },
 }
 
+
 # File Permissions for windows :
 # example: icacls "C:\path\to\file.txt" /grant username:(R,W)
 # F: Full control
@@ -66,8 +78,6 @@ FILE_OPERATIONS: Dict[FileOperation, Dict[Platform, List[str]]] = {
 # /deny: Denies permissions for a user.
 # /remove: Removes all permissions for a user.
 # username:(R,W)
-
-
 
 # File Permission for linux:
 # example: chmod u=rwx,o=r <filename>
@@ -85,15 +95,40 @@ FILE_OPERATIONS: Dict[FileOperation, Dict[Platform, List[str]]] = {
 FILE_PERMISSIONS: Dict[FilePermission, Dict[Platform, List[str]]] ={
 
     FilePermission.MODIFY: {
-        Platform.WINDOWS: ["cmd", "/c","icacls", "path", "options", "username_permission"],
-        Platform.MAC: ["chmod", "permission", "resource"],
-        Platform.LINUX: ["chmod", "permission", "resource"]
+        Platform.WINDOWS: ["cmd", "/c","icacls"],
+        Platform.MAC: ["chmod", "permission"],
+        Platform.LINUX: ["chmod", "permission"]
 
     },
     FilePermission.LIST:{
-        Platform.WINDOWS: ["cmd", "/c", "dir"],
-        Platform.MAC: ["ls", "-l",],
-        Platform.LINUX: ["ls", "-l",],
+        Platform.WINDOWS: ["powershell", "/c","dir"],
+        Platform.MAC: ["ls", "-al"],
+        Platform.LINUX: ["ls", "-al"]
+    }
+}
+
+
+# Dictionary for Directory Operations across platforms
+DIRECTORY_OPERATIONS: Dict[DirectoryOperation, Dict[Platform, List[str]]] = {
+    DirectoryOperation.MAKE: {
+        Platform.WINDOWS: ["cmd", "/c", "mkdir"],  # Command for making a directory on Windows
+        Platform.LINUX: ["mkdir"],  # Command for making a directory on Linux
+        Platform.MAC: ["mkdir"],  # Command for making a directory on macOS
+    },
+    DirectoryOperation.REMOVE: {
+        Platform.WINDOWS: ["cmd", "/c", "rmdir"],  # Command for removing a directory on Windows
+        Platform.LINUX: ["rm", "-r"],  # Command for removing a directory on Linux
+        Platform.MAC: ["rm", "-r"],  # Command for removing a directory on macOS
+    },
+    DirectoryOperation.CHANGE: {
+        Platform.WINDOWS: ["cmd", "/c", "cd"],  # Command for changing directory on Windows
+        Platform.LINUX: ["cd"],  # Command for changing directory on Linux
+        Platform.MAC: ["cd"],  # Command for changing directory on macOS
+    },
+    DirectoryOperation.CURRENT: {
+        Platform.WINDOWS: ["cmd", "/c", "cd"],  # Command for showing current directory on Windows
+        Platform.LINUX: ["pwd"],  # Command for showing current directory on Linux
+        Platform.MAC: ["pwd"],  # Command for showing current directory on macOS
     }
 }
 
@@ -109,7 +144,8 @@ ConsoleColors = {
 
 
 # A list that contains the valid file extensions that the program supports.
-VALID_EXTENSIONS = [".txt", ".pdf", ".docx"]
+VALID_EXTENSIONS = [".txt", ".pdf", ".docx",".dat",".csv",".json",".xml",".html",".css",".js",".py",".java",".cpp",".c",".h",".hpp",".php",".sql",".sh",".bat"]
+
 
 # A list of valid pipe symbols that may be used in command-line operations.
 PIPES: list[str] = ["<", ">", "|"]
