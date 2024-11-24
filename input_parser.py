@@ -18,15 +18,23 @@
 
 
 
+import shlex
 from typing import List
-from static.exceptions import InvalidCommand
-from static.constant_types import FileOperation, VALID_EXTENSIONS, PIPES
 
+from validator.redirect_validator import RedirectValidator
+
+from validator.directory_management_validator import DirectoryManagementValidator
+from validator.file_operation_validator import FileOperationValidator
+from validator.file_access_validator import FileAccessValidator
+from validator.piped_command import PipedCommandValidator
+from validator.static.exceptions import InvalidCommand
+from validator.help_validator import HelpValidator
+from validator.validator import Validator
 
 class InputParser:
     def __init__(self, user_input: str) -> None:
         self.user_input: str = user_input.strip()
-        self.VALID_OPERATIONS: List[str] = self.get_valid_operations()
+        self.valid = Validator()
         self.parsed_inputs: List[str] = self.split_and_lowercase_user_input()
 
     def split_and_lowercase_user_input(self) -> List[str]:
@@ -36,16 +44,11 @@ class InputParser:
             through the list of words and check if it has valid commands which
             it then removes the command and adds the lowercase of that removed
             command.
-            :return: list of operations
+            return: list of operations
         """
-        input_list: List[str] = self.user_input.split(" ", maxsplit=6)
+        input_list: List[str] = shlex.split(self.user_input)
+        return [command.lower() if command in self.valid.get_valid_operations() else command for command in input_list]
 
-        for index, command in enumerate(input_list):
-            if command in self.VALID_OPERATIONS:
-                input_list.pop(index)
-                input_list.insert(index, command.lower())
-
-        return input_list
 
     def retrieved_parsed_input(self):
         """
@@ -59,7 +62,7 @@ class InputParser:
         if self.is_parsed_input_valid():
             return self.parsed_inputs
 
-        raise InvalidCommand(f"Invalid..! Command '{self.user_input}' is not valid")
+        raise InvalidCommand(f"Invalid..! Command: '{self.user_input}' is not valid")
 
 
     def is_parsed_input_valid(self) -> bool:
@@ -82,94 +85,36 @@ class InputParser:
             return False
 
         operation = self.parsed_inputs[0]
-        if operation not in self.VALID_OPERATIONS:
+        if operation not in self.valid.get_valid_operations():
             return False
 
-        if len(self.parsed_inputs) < 2 and operation != "help":
-            return False
+        elif "|" in self.parsed_inputs:
+            piped_commands = PipedCommandValidator(self.parsed_inputs)
+            return piped_commands.valid_piped_operations()
 
-        if operation == "help":
-            return self.valid_help_input()
 
-        if len(self.parsed_inputs) == 2:
-            return self.valid_file_extension(self.parsed_inputs[1])
+        elif any(symbol in self.parsed_inputs for symbol in ['<', '>']):
+            return RedirectValidator(self.parsed_inputs).validate()
 
-        if len(self.parsed_inputs) > 2:
-            if self.parsed_inputs[3] not in PIPES or not self.valid_piped_operations(
-                self.parsed_inputs[4:]
-            ):
-                return False
+        elif operation in ["modify", "list"]:
+            file_access_valid = FileAccessValidator(self.parsed_inputs)
+            return file_access_valid.validate()
 
-        return True
+        elif operation == "help":
+            help_valid: HelpValidator = HelpValidator(self.parsed_inputs)
+            return help_valid.valid_help_input()
 
-    def valid_help_input(self):
-        """
-            if the user request to use the help operation, this function is called to validate
-            the user input for the help command, it checks id the user is requesting
-            specific help for a supported command or the general help where list all
-            supported commands.
-            :return: True or False.
-        """
-        if len(self.parsed_inputs) == 1:
-            return True
+        elif operation in ["create", "delete", "rename"]:
+                file_operation_valid = FileOperationValidator(self.parsed_inputs[1:])
+                return file_operation_valid.is_operation_valid()
 
+<<<<<<< HEAD
+        elif operation in ["change", "remove", "make", "pwd"]:
+            directory_valid = DirectoryManagementValidator(self.parsed_inputs)
+            return  directory_valid.validate()
+=======
         return len(self.parsed_inputs) == 2 and self.parsed_inputs[1] in FileOperation
+>>>>>>> origin/main
 
-    def valid_piped_operations(self, piped_operations: list[str]) -> bool:
-        """
-            if the user opted for a piped command then this function is used
-             to check the right half of the piped input to see if it is valid.
-            :param piped_operations: operations on the right half of command
-            :return: Function: is_operation_valid(...,...) to validate
-        """
-        return self.is_operation_valid(piped_operations[0], piped_operations[1:])
 
-    def is_operation_valid(self, operation: str, args: list[str]) -> bool:
-        """
-            Validates the operation and its arguments.
-            This function checks whether both the operation and the provided arguments are valid.
-            For example, if the user wants to create a file, the function checks if the operation
-            is 'create' and the arguments include a valid file extension (e.g., 'filename.txt').
-
-            :param operation: The command that the user wants to execute (e.g., 'create').
-            :param args: The arguments for the command (e.g., the filename in 'create <filename>').
-            :return: True if both the operation and its arguments are valid.
-        """
-
-        operations: list[str] = self.VALID_OPERATIONS
-
-        if operation not in operations:
-            return False
-
-        if len(args) == 1 and not self.valid_file_extension(args[0]):
-            return False
-
-        return True
-
-    @staticmethod
-    def get_valid_operations() -> List[str]:
-        """
-            function is used to retrieve the operations
-            the program support
-            operations is retrieved from the enum: 'FileOperation'
-            from 'FileOperation' it retrieves the names which are essentially
-            the variables in that enum and because they are upper
-            case they are needed to be lowercase
-            and 'help' operation will be added as that is not in
-            the 'FileOperation' enum, but it is a
-            valid operation.
-            :return: A list of valid operations.
-        """
-        operations: list[str] = [operation.value for operation in FileOperation]
-        operations.append("help")
-
-        return operations
-
-    @staticmethod
-    def valid_file_extension(file: str) -> bool:
-        """
-            function is used check if the inputted file from the user
-            has a supported file extension
-        """
-        file_extension = file.split(".")[-1]
-        return f".{file_extension}" in VALID_EXTENSIONS
+        return False
